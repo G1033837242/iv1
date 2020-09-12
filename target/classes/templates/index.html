@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="http://unpkg.com/vue@next"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="">
+    <title>Vue3</title>
+</head>
+<body>
+<div id="hello-vue">
+    <div  class="m-3 p-3 border border-success">
+        {{message}}
+        {{itemList && itemList[0] ? itemList[0].name : 'empty'}}
+    </div>
+    <div class="m-3">
+        <label for="item-input" class="form-label">输入箱子的属性</label>
+        <div class="row">
+            <div class="col-3">
+                <span>箱子名字</span>
+                <input type="text" v-model="box.name">
+            </div>
+            <div class="col-2">
+                <span>长</span>
+                <input type="number" v-model="box.length" style="width: 100%;">
+            </div>
+            <div class="col-2">
+                <span>宽</span>
+                <input type="number" v-model="box.width" style="width: 100%;">
+            </div>
+            <div class="col-2">
+                <span>高</span>
+                <input type="number" v-model="box.height" style="width: 100%;">
+            </div>
+        </div>
+        <button class="btn btn-primary mt-3" type="submit" @click="insertBox()"  >存入数据库</button>
+    </div >
+
+    <div class="m-3">
+        <label for="item-input" class="form-label">输入物品的属性</label>
+        <div class="row">
+            <div class="col-3" >
+                <span>物品名字</span>
+                <input type="text" v-model="item.name">
+            </div>
+            <div class="col-2">
+                <span>长</span>
+                <input type="number" v-model="item.length" style="width: 100%;">
+            </div>
+            <div class="col-2">
+                <span>宽</span>
+                <input type="number" v-model="item.width" style="width: 100%;">
+            </div>
+            <div class="col-2">
+                <span>高</span>
+                <input type="number" v-model="item.height" style="width: 100%;">
+            </div>
+        </div>
+        <button class="btn btn-primary mt-3" type="submit" @click="insertItem()">存入数据库</button>
+    </div>
+
+    <div class="m-3">
+        <div class="row">
+            <div class="col-3">
+                <label for="exampleFormControlSelect1">请选择希望放入箱子的物品</label>
+                <select class="form-control" v-model="selectedItem">
+                    <option v-for="item in itemList" :value="item.name">
+                        {{item.name}} - width: {{item.wide}}, height: {{item.height}}, length: {{item.length}}
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-3">
+                <label for="exampleFormControlSelect1">请选择你想放入物品的箱子</label>
+                <select class="form-control" id="exampleFormControlSelect1">
+                    <option v-for="box in boxList" >
+                        <div v-if="boxList">
+                            {{box.name}} - width: {{box.wide}}, height: {{box.height}}, length: {{box.length}}
+                        </div>
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const HelloVueApp = {
+        data() {
+            return {
+                message: 'Vue3 !',
+                selectedItem: '',
+                item: {
+                    name: '',
+                    length: 0,
+                    width: 0,
+                    height: 0
+                },
+                box: {
+                    name: '',
+                    length: 0,
+                    width: 0,
+                    height: 0
+                },
+                itemList: [],
+                boxList: null
+            }
+        },
+        async created () {
+            axios.defaults.headers['Access-Control-Allow-Origin'] = '*';
+            let itemListRes = await axios.get('/iv/toInsertInto')
+            console.log(itemListRes)
+            this.itemList = itemListRes.data.data
+            console.log(this.itemList)
+        },
+        watch: {
+            async selectedItem (val) {
+                const boxRes = await axios.get('/iv/boxList?gName=' + val)
+                console.log(boxRes.data.data)
+                if (boxRes.data.status == 500) {
+                    console.log('set box to empty')
+                    this.boxList = null
+                } else {
+                    this.boxList = boxRes.data.data
+                }
+            }
+        },
+        methods: {
+            test () {
+                console.log(this.itemList)
+            },
+            insertBox () {
+                axios.post('/iv/insertBox', {
+                    name: this.box.name,
+                    height: this.box.height,
+                    wide: this.box.width,
+                    length: this.box.length
+                })
+                    .then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            insertItem () {
+                axios.post('/iv/insertGoods', {
+                    name: this.item.name,
+                    height: this.item.height,
+                    wide: this.item.width,
+                    length: this.item.length
+                })
+                    .then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+
+            }
+        }
+    }
+    Vue.createApp(HelloVueApp).mount('#hello-vue')
+</script>
+</body>
+</html>

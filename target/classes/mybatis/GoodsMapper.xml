@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lx.mapper.GoodsMapper">
+  <resultMap id="BaseResultMap" type="com.lx.pojo.Goods">
+    <!--@mbg.generated-->
+    <!--@Table goods-->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="length" jdbcType="VARCHAR" property="length" />
+    <result column="wide" jdbcType="VARCHAR" property="wide" />
+    <result column="height" jdbcType="VARCHAR" property="height" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, `name`, `length`, wide, height
+  </sql>
+  <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from goods
+    where name = #{name}
+  </select>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.lx.pojo.Goods" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into goods (`name`, `length`, wide, 
+      height)
+    values (#{name,jdbcType=VARCHAR}, #{length,jdbcType=VARCHAR}, #{wide,jdbcType=VARCHAR}, 
+      #{height,jdbcType=VARCHAR})
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from goods
+  </select>
+</mapper>
